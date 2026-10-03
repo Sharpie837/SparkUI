@@ -103,12 +103,18 @@ end
 function SparkUI:CreateWindow(config)
 	config = config or {}
 	local windowTitle = config.Title or "Spark"
-	local toggleKey = config.Keybind or Enum.KeyCode.RightShift
+	local toggleKey = resolveKeyCode(config.Keybind) or Enum.KeyCode.RightShift
 
 	local parentContainer = getGuiParent()
 	local old = parentContainer:FindFirstChild("Spark Panel")
 	if old then
 		old:Destroy()
+	end
+
+	local connections = {}
+	local function trackConn(conn)
+		table.insert(connections, conn)
+		return conn
 	end
 
 	local screenGui = Instance.new("ScreenGui")
@@ -117,6 +123,15 @@ function SparkUI:CreateWindow(config)
 	screenGui.IgnoreGuiInset = true
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	screenGui.Parent = parentContainer
+
+	screenGui.Destroying:Connect(function()
+		for _, conn in connections do
+			if conn.Connected then
+				conn:Disconnect()
+			end
+		end
+		table.clear(connections)
+	end)
 
 	local window = Instance.new("Frame")
 	window.Name = "Window"
@@ -393,41 +408,40 @@ function SparkUI:CreateWindow(config)
 	brand.InputBegan:Connect(beginDrag)
 	topHeader.InputBegan:Connect(beginDrag)
 
-	UserInputService.InputEnded:Connect(function(io)
+	trackConn(UserInputService.InputEnded:Connect(function(io)
 		if io.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = false
 		end
-	end)
+	end))
 
-	UserInputService.InputChanged:Connect(function(io)
+	trackConn(UserInputService.InputChanged:Connect(function(io)
 		if dragging and io.UserInputType == Enum.UserInputType.MouseMovement then
 			local delta = UserInputService:GetMouseLocation() - dragStart
 			TweenService:Create(window, TWEEN_FAST, {
 				Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y),
 			}):Play()
 		end
-	end)
+	end))
 
 	local isBindingAnyKey = false
 
 	local isMenuOpen = true
-	UserInputService.InputBegan:Connect(function(io, gpe)
-		if not gpe and not isBindingAnyKey and io.KeyCode == toggleKey then
+	trackConn(UserInputService.InputBegan:Connect(function(io)
+		if UserInputService:GetFocusedTextBox() then
+			return
+		end
+		if not isBindingAnyKey and io.KeyCode == toggleKey then
 			isMenuOpen = not isMenuOpen
+			dragging = false
 			if isMenuOpen then
+				winScale.Scale = 0.95
 				window.Visible = true
 				TweenService:Create(winScale, TWEEN_SMOOTH, { Scale = 1 }):Play()
 			else
-				local tw = TweenService:Create(winScale, TWEEN_FAST, { Scale = 0.95 })
-				tw:Play()
-				tw.Completed:Once(function()
-					if not isMenuOpen then
-						window.Visible = false
-					end
-				end)
+				window.Visible = false
 			end
 		end
-	end)
+	end))
 
 	local tabs = {}
 	local currentTab = nil
@@ -677,7 +691,7 @@ function SparkUI:CreateWindow(config)
 				TweenService:Create(pStroke, TWEEN_FAST, { Color = Color3.fromRGB(215, 215, 228) }):Play()
 			end)
 
-			UserInputService.InputBegan:Connect(function(io, gpe)
+			trackConn(UserInputService.InputBegan:Connect(function(io)
 				if binding then
 					if io.UserInputType == Enum.UserInputType.Keyboard then
 						if io.KeyCode == Enum.KeyCode.Backspace or io.KeyCode == Enum.KeyCode.Escape then
@@ -707,12 +721,12 @@ function SparkUI:CreateWindow(config)
 					return
 				end
 
-				if not gpe and not isBindingAnyKey and boundKey and io.KeyCode == boundKey then
+				if not UserInputService:GetFocusedTextBox() and not isBindingAnyKey and boundKey and io.KeyCode == boundKey then
 					if onKeyTriggered then
 						onKeyTriggered(boundKey)
 					end
 				end
-			end)
+			end))
 
 			return pill
 		end
