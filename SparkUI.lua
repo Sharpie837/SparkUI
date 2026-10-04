@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
 local CoreGui = game:GetService("CoreGui")
 
 local player = Players.LocalPlayer
@@ -33,14 +34,31 @@ local TWEEN_FAST = TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirecti
 local TWEEN_SMOOTH = TweenInfo.new(0.24, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 local TWEEN_SPRING = TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
+local THEME = {
+	windowBg = Color3.fromRGB(6, 6, 6),
+	windowBorder = Color3.fromRGB(24, 24, 24),
+	divider = Color3.fromRGB(20, 20, 20),
+	cardBg = Color3.fromRGB(11, 11, 11),
+	cardHover = Color3.fromRGB(15, 15, 15),
+	cardBorder = Color3.fromRGB(22, 22, 22),
+	cardBorderHover = Color3.fromRGB(34, 34, 34),
+	pillBg = Color3.fromRGB(16, 16, 16),
+	pillHover = Color3.fromRGB(22, 22, 22),
+	pillBorder = Color3.fromRGB(30, 30, 30),
+	pillBorderHover = Color3.fromRGB(46, 46, 46),
+	textPrimary = Color3.fromRGB(245, 245, 245),
+	textSecondary = Color3.fromRGB(205, 205, 205),
+	textMuted = Color3.fromRGB(130, 130, 130),
+}
+
 local TAB_COLORS = {
-	activeBg = Color3.fromRGB(22, 22, 26),
-	hoverBg = Color3.fromRGB(16, 16, 19),
-	activeBorder = Color3.fromRGB(36, 36, 43),
-	hoverBorder = Color3.fromRGB(25, 25, 30),
-	activeText = Color3.fromRGB(244, 244, 248),
-	hoverText = Color3.fromRGB(200, 200, 208),
-	idleText = Color3.fromRGB(118, 118, 128),
+	activeBg = Color3.fromRGB(17, 17, 17),
+	hoverBg = Color3.fromRGB(12, 12, 12),
+	activeBorder = Color3.fromRGB(32, 32, 32),
+	hoverBorder = Color3.fromRGB(22, 22, 22),
+	activeText = Color3.fromRGB(245, 245, 245),
+	hoverText = Color3.fromRGB(200, 200, 200),
+	idleText = Color3.fromRGB(122, 122, 122),
 }
 
 local KEY_NAMES = {
@@ -80,6 +98,12 @@ local function formatKeyName(key)
 		return "None"
 	end
 	return KEY_NAMES[key.Name] or key.Name
+end
+
+local function getViewportMouse()
+	local pos = UserInputService:GetMouseLocation()
+	local inset = GuiService:GetGuiInset()
+	return Vector2.new(pos.X - inset.X, pos.Y - inset.Y)
 end
 
 local SparkUI = {}
@@ -138,7 +162,7 @@ function SparkUI:CreateWindow(config)
 	window.AnchorPoint = Vector2.new(0.5, 0.5)
 	window.Position = UDim2.fromScale(0.5, 0.5)
 	window.Size = UDim2.fromOffset(590, 390)
-	window.BackgroundColor3 = Color3.fromRGB(11, 11, 13)
+	window.BackgroundColor3 = THEME.windowBg
 	window.BorderSizePixel = 0
 	window.Visible = true
 	window.Parent = screenGui
@@ -149,13 +173,13 @@ function SparkUI:CreateWindow(config)
 	winScale.Parent = window
 
 	local winCorner = Instance.new("UICorner")
-	winCorner.CornerRadius = UDim.new(0, 8)
+	winCorner.CornerRadius = UDim.new(0, 12)
 	winCorner.Parent = window
 
 	local winStroke = Instance.new("UIStroke")
 	winStroke.Name = "Stroke"
-	winStroke.Color = Color3.fromRGB(36, 36, 42)
-	winStroke.Thickness = 1
+	winStroke.Color = THEME.windowBorder
+	winStroke.Thickness = 1.5
 	winStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	winStroke.Parent = window
 
@@ -163,11 +187,11 @@ function SparkUI:CreateWindow(config)
 	dropShadow.Name = "Shadow"
 	dropShadow.AnchorPoint = Vector2.new(0.5, 0.5)
 	dropShadow.Position = UDim2.fromScale(0.5, 0.5)
-	dropShadow.Size = UDim2.new(1, 48, 1, 48)
+	dropShadow.Size = UDim2.new(1, 56, 1, 56)
 	dropShadow.BackgroundTransparency = 1
 	dropShadow.Image = "rbxassetid://3523728077"
 	dropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-	dropShadow.ImageTransparency = 0.52
+	dropShadow.ImageTransparency = 0.45
 	dropShadow.ZIndex = 0
 	dropShadow.Parent = window
 
@@ -182,7 +206,7 @@ function SparkUI:CreateWindow(config)
 	sideDivider.Name = "Divider"
 	sideDivider.Size = UDim2.new(0, 1, 1, 0)
 	sideDivider.Position = UDim2.new(1, 0, 0, 0)
-	sideDivider.BackgroundColor3 = Color3.fromRGB(34, 34, 40)
+	sideDivider.BackgroundColor3 = THEME.divider
 	sideDivider.BorderSizePixel = 0
 	sideDivider.Parent = sidebar
 
@@ -198,7 +222,7 @@ function SparkUI:CreateWindow(config)
 	brandText.Size = UDim2.new(1, -24, 1, 0)
 	brandText.BackgroundTransparency = 1
 	brandText.Text = windowTitle
-	brandText.TextColor3 = Color3.fromRGB(242, 242, 247)
+	brandText.TextColor3 = THEME.textPrimary
 	brandText.FontFace = FONT_SEMI
 	brandText.TextSize = 14
 	brandText.TextXAlignment = Enum.TextXAlignment.Left
@@ -218,7 +242,7 @@ function SparkUI:CreateWindow(config)
 	tabPad.Parent = tabList
 
 	local tabLayout = Instance.new("UIListLayout")
-	tabLayout.Padding = UDim.new(0, 3)
+	tabLayout.Padding = UDim.new(0, 4)
 	tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	tabLayout.Parent = tabList
 
@@ -234,7 +258,7 @@ function SparkUI:CreateWindow(config)
 	profileTopLine.Name = "TopLine"
 	profileTopLine.Size = UDim2.new(1, 0, 0, 1)
 	profileTopLine.Position = UDim2.fromOffset(0, 0)
-	profileTopLine.BackgroundColor3 = Color3.fromRGB(34, 34, 40)
+	profileTopLine.BackgroundColor3 = THEME.divider
 	profileTopLine.BorderSizePixel = 0
 	profileTopLine.Parent = profileCard
 
@@ -243,17 +267,17 @@ function SparkUI:CreateWindow(config)
 	avatarWrap.AnchorPoint = Vector2.new(0, 0.5)
 	avatarWrap.Position = UDim2.new(0, 12, 0.5, 1)
 	avatarWrap.Size = UDim2.fromOffset(32, 32)
-	avatarWrap.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+	avatarWrap.BackgroundColor3 = THEME.pillBg
 	avatarWrap.BorderSizePixel = 0
 	avatarWrap.Parent = profileCard
 
 	local avCorner = Instance.new("UICorner")
-	avCorner.CornerRadius = UDim.new(0, 6)
+	avCorner.CornerRadius = UDim.new(0, 8)
 	avCorner.Parent = avatarWrap
 
 	local avStroke = Instance.new("UIStroke")
-	avStroke.Color = Color3.fromRGB(38, 38, 45)
-	avStroke.Thickness = 1
+	avStroke.Color = THEME.pillBorder
+	avStroke.Thickness = 1.2
 	avStroke.Parent = avatarWrap
 
 	local avatarImg = Instance.new("ImageLabel")
@@ -265,7 +289,7 @@ function SparkUI:CreateWindow(config)
 	avatarImg.Parent = avatarWrap
 
 	local avImgCorner = Instance.new("UICorner")
-	avImgCorner.CornerRadius = UDim.new(0, 6)
+	avImgCorner.CornerRadius = UDim.new(0, 8)
 	avImgCorner.Parent = avatarImg
 
 	local userLbl = Instance.new("TextLabel")
@@ -274,7 +298,7 @@ function SparkUI:CreateWindow(config)
 	userLbl.Size = UDim2.new(1, -58, 0, 15)
 	userLbl.BackgroundTransparency = 1
 	userLbl.Text = player.DisplayName or player.Name
-	userLbl.TextColor3 = Color3.fromRGB(238, 238, 244)
+	userLbl.TextColor3 = THEME.textPrimary
 	userLbl.FontFace = FONT_SEMI
 	userLbl.TextSize = 12
 	userLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -371,7 +395,7 @@ function SparkUI:CreateWindow(config)
 	pageTitle.Size = UDim2.new(0.6, 0, 1, 0)
 	pageTitle.BackgroundTransparency = 1
 	pageTitle.Text = ""
-	pageTitle.TextColor3 = Color3.fromRGB(235, 235, 240)
+	pageTitle.TextColor3 = THEME.textPrimary
 	pageTitle.FontFace = FONT_MED
 	pageTitle.TextSize = 13
 	pageTitle.TextXAlignment = Enum.TextXAlignment.Left
@@ -381,7 +405,7 @@ function SparkUI:CreateWindow(config)
 	topDivider.Name = "Divider"
 	topDivider.Position = UDim2.fromOffset(0, 38)
 	topDivider.Size = UDim2.new(1, 0, 0, 1)
-	topDivider.BackgroundColor3 = Color3.fromRGB(34, 34, 40)
+	topDivider.BackgroundColor3 = THEME.divider
 	topDivider.BorderSizePixel = 0
 	topDivider.Parent = contentArea
 
@@ -520,12 +544,12 @@ function SparkUI:CreateWindow(config)
 		btn.Parent = tabList
 
 		local corner = Instance.new("UICorner")
-		corner.CornerRadius = UDim.new(0, 6)
+		corner.CornerRadius = UDim.new(0, 8)
 		corner.Parent = btn
 
 		local stroke = Instance.new("UIStroke")
 		stroke.Color = TAB_COLORS.hoverBorder
-		stroke.Thickness = 1
+		stroke.Thickness = 1.2
 		stroke.Transparency = 1
 		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		stroke.Parent = btn
@@ -557,7 +581,7 @@ function SparkUI:CreateWindow(config)
 		page.BackgroundTransparency = 1
 		page.BorderSizePixel = 0
 		page.ScrollBarThickness = 2
-		page.ScrollBarImageColor3 = Color3.fromRGB(48, 48, 56)
+		page.ScrollBarImageColor3 = Color3.fromRGB(42, 42, 42)
 		page.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		page.CanvasSize = UDim2.new(0, 0, 0, 0)
 		page.Visible = false
@@ -571,7 +595,7 @@ function SparkUI:CreateWindow(config)
 		pad.Parent = page
 
 		local layout = Instance.new("UIListLayout")
-		layout.Padding = UDim.new(0, 6)
+		layout.Padding = UDim.new(0, 7)
 		layout.SortOrder = Enum.SortOrder.LayoutOrder
 		layout.Parent = page
 
@@ -633,47 +657,47 @@ function SparkUI:CreateWindow(config)
 			pill.AnchorPoint = Vector2.new(1, 0.5)
 			pill.Position = UDim2.new(1, rightOffset, 0.5, 0)
 			pill.AutomaticSize = Enum.AutomaticSize.X
-			pill.Size = UDim2.fromOffset(0, 20)
-			pill.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+			pill.Size = UDim2.fromOffset(0, 22)
+			pill.BackgroundColor3 = THEME.pillBg
 			pill.AutoButtonColor = false
 			pill.Text = formatKeyName(boundKey)
-			pill.TextColor3 = Color3.fromRGB(165, 165, 178)
+			pill.TextColor3 = THEME.textSecondary
 			pill.FontFace = FONT_SEMI
 			pill.TextSize = 11
 			pill.Parent = parent
 
 			local pPad = Instance.new("UIPadding")
-			pPad.PaddingLeft = UDim.new(0, 7)
-			pPad.PaddingRight = UDim.new(0, 7)
+			pPad.PaddingLeft = UDim.new(0, 8)
+			pPad.PaddingRight = UDim.new(0, 8)
 			pPad.Parent = pill
 
 			local pCorner = Instance.new("UICorner")
-			pCorner.CornerRadius = UDim.new(0, 4)
+			pCorner.CornerRadius = UDim.new(0, 6)
 			pCorner.Parent = pill
 
 			local pStroke = Instance.new("UIStroke")
-			pStroke.Color = Color3.fromRGB(34, 34, 42)
-			pStroke.Thickness = 1
+			pStroke.Color = THEME.pillBorder
+			pStroke.Thickness = 1.2
 			pStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			pStroke.Parent = pill
 
 			pill.MouseEnter:Connect(function()
 				if not binding then
 					TweenService:Create(pill, TWEEN_FAST, {
-						BackgroundColor3 = Color3.fromRGB(24, 24, 30),
-						TextColor3 = Color3.fromRGB(235, 235, 244),
+						BackgroundColor3 = THEME.pillHover,
+						TextColor3 = THEME.textPrimary,
 					}):Play()
-					TweenService:Create(pStroke, TWEEN_FAST, { Color = Color3.fromRGB(52, 52, 64) }):Play()
+					TweenService:Create(pStroke, TWEEN_FAST, { Color = THEME.pillBorderHover }):Play()
 				end
 			end)
 
 			pill.MouseLeave:Connect(function()
 				if not binding then
 					TweenService:Create(pill, TWEEN_FAST, {
-						BackgroundColor3 = Color3.fromRGB(20, 20, 25),
-						TextColor3 = Color3.fromRGB(165, 165, 178),
+						BackgroundColor3 = THEME.pillBg,
+						TextColor3 = THEME.textSecondary,
 					}):Play()
-					TweenService:Create(pStroke, TWEEN_FAST, { Color = Color3.fromRGB(34, 34, 42) }):Play()
+					TweenService:Create(pStroke, TWEEN_FAST, { Color = THEME.pillBorder }):Play()
 				end
 			end)
 
@@ -685,10 +709,10 @@ function SparkUI:CreateWindow(config)
 				isBindingAnyKey = true
 				pill.Text = "..."
 				TweenService:Create(pill, TWEEN_FAST, {
-					BackgroundColor3 = Color3.fromRGB(26, 26, 33),
-					TextColor3 = Color3.fromRGB(245, 245, 252),
+					BackgroundColor3 = Color3.fromRGB(24, 24, 24),
+					TextColor3 = THEME.textPrimary,
 				}):Play()
-				TweenService:Create(pStroke, TWEEN_FAST, { Color = Color3.fromRGB(215, 215, 228) }):Play()
+				TweenService:Create(pStroke, TWEEN_FAST, { Color = Color3.fromRGB(220, 220, 220) }):Play()
 			end)
 
 			trackConn(UserInputService.InputBegan:Connect(function(io)
@@ -705,10 +729,10 @@ function SparkUI:CreateWindow(config)
 						binding = false
 						pill.Text = formatKeyName(boundKey)
 						TweenService:Create(pill, TWEEN_FAST, {
-							BackgroundColor3 = Color3.fromRGB(20, 20, 25),
-							TextColor3 = Color3.fromRGB(165, 165, 178),
+							BackgroundColor3 = THEME.pillBg,
+							TextColor3 = THEME.textSecondary,
 						}):Play()
-						TweenService:Create(pStroke, TWEEN_FAST, { Color = Color3.fromRGB(34, 34, 42) }):Play()
+						TweenService:Create(pStroke, TWEEN_FAST, { Color = THEME.pillBorder }):Play()
 
 						if onKeyChanged then
 							onKeyChanged(boundKey)
@@ -745,18 +769,18 @@ function SparkUI:CreateWindow(config)
 			row.Name = title
 			row.LayoutOrder = itemOrder
 			row.Size = UDim2.new(1, 0, 0, 38)
-			row.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+			row.BackgroundColor3 = THEME.cardBg
 			row.AutoButtonColor = false
 			row.Text = ""
 			row.Parent = page
 
 			local corner = Instance.new("UICorner")
-			corner.CornerRadius = UDim.new(0, 6)
+			corner.CornerRadius = UDim.new(0, 9)
 			corner.Parent = row
 
 			local stroke = Instance.new("UIStroke")
-			stroke.Color = Color3.fromRGB(26, 26, 31)
-			stroke.Thickness = 1
+			stroke.Color = THEME.cardBorder
+			stroke.Thickness = 1.2
 			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			stroke.Parent = row
 
@@ -765,7 +789,7 @@ function SparkUI:CreateWindow(config)
 			titleLbl.Size = UDim2.new(1, if hasKeybind then -125 else -70, 1, 0)
 			titleLbl.BackgroundTransparency = 1
 			titleLbl.Text = title
-			titleLbl.TextColor3 = if defaultOn then Color3.fromRGB(240, 240, 245) else Color3.fromRGB(185, 185, 195)
+			titleLbl.TextColor3 = if defaultOn then THEME.textPrimary else THEME.textSecondary
 			titleLbl.FontFace = FONT_MED
 			titleLbl.TextSize = 13
 			titleLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -775,7 +799,7 @@ function SparkUI:CreateWindow(config)
 			switch.AnchorPoint = Vector2.new(1, 0.5)
 			switch.Position = UDim2.new(1, -14, 0.5, 0)
 			switch.Size = UDim2.fromOffset(32, 17)
-			switch.BackgroundColor3 = if defaultOn then Color3.fromRGB(240, 240, 246) else Color3.fromRGB(20, 20, 24)
+			switch.BackgroundColor3 = if defaultOn then THEME.textPrimary else THEME.pillBg
 			switch.BorderSizePixel = 0
 			switch.Parent = row
 
@@ -784,15 +808,15 @@ function SparkUI:CreateWindow(config)
 			swCorner.Parent = switch
 
 			local swStroke = Instance.new("UIStroke")
-			swStroke.Color = if defaultOn then Color3.fromRGB(240, 240, 246) else Color3.fromRGB(38, 38, 45)
-			swStroke.Thickness = 1
+			swStroke.Color = if defaultOn then THEME.textPrimary else THEME.pillBorder
+			swStroke.Thickness = 1.2
 			swStroke.Parent = switch
 
 			local knob = Instance.new("Frame")
 			knob.AnchorPoint = Vector2.new(0, 0.5)
 			knob.Position = if defaultOn then UDim2.new(1, -14, 0.5, 0) else UDim2.new(0, 3, 0.5, 0)
 			knob.Size = UDim2.fromOffset(11, 11)
-			knob.BackgroundColor3 = if defaultOn then Color3.fromRGB(11, 11, 13) else Color3.fromRGB(115, 115, 126)
+			knob.BackgroundColor3 = if defaultOn then THEME.windowBg else THEME.textMuted
 			knob.BorderSizePixel = 0
 			knob.Parent = switch
 
@@ -806,23 +830,23 @@ function SparkUI:CreateWindow(config)
 				isOn = newState
 
 				TweenService:Create(titleLbl, TWEEN_FAST, {
-					TextColor3 = if isOn then Color3.fromRGB(240, 240, 245) else Color3.fromRGB(185, 185, 195),
+					TextColor3 = if isOn then THEME.textPrimary else THEME.textSecondary,
 				}):Play()
 				TweenService:Create(knob, TweenInfo.new(0.09, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Size = UDim2.fromOffset(14, 11),
 				}):Play()
 				TweenService:Create(switch, TWEEN_SMOOTH, {
-					BackgroundColor3 = if isOn then Color3.fromRGB(240, 240, 246) else Color3.fromRGB(20, 20, 24),
+					BackgroundColor3 = if isOn then THEME.textPrimary else THEME.pillBg,
 				}):Play()
 				TweenService:Create(swStroke, TWEEN_SMOOTH, {
-					Color = if isOn then Color3.fromRGB(240, 240, 246) else Color3.fromRGB(38, 38, 45),
+					Color = if isOn then THEME.textPrimary else THEME.pillBorder,
 				}):Play()
 
 				task.delay(0.05, function()
 					TweenService:Create(knob, TWEEN_SPRING, {
 						Size = UDim2.fromOffset(11, 11),
 						Position = if isOn then UDim2.new(1, -14, 0.5, 0) else UDim2.new(0, 3, 0.5, 0),
-						BackgroundColor3 = if isOn then Color3.fromRGB(11, 11, 13) else Color3.fromRGB(115, 115, 126),
+						BackgroundColor3 = if isOn then THEME.windowBg else THEME.textMuted,
 					}):Play()
 				end)
 
@@ -838,13 +862,13 @@ function SparkUI:CreateWindow(config)
 			end
 
 			row.MouseEnter:Connect(function()
-				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(18, 18, 22) }):Play()
-				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(36, 36, 43) }):Play()
+				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = THEME.cardHover }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = THEME.cardBorderHover }):Play()
 			end)
 
 			row.MouseLeave:Connect(function()
-				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(15, 15, 18) }):Play()
-				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(26, 26, 31) }):Play()
+				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = THEME.cardBg }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = THEME.cardBorder }):Play()
 			end)
 
 			row.MouseButton1Click:Connect(function()
@@ -865,17 +889,17 @@ function SparkUI:CreateWindow(config)
 			row.Name = title
 			row.LayoutOrder = itemOrder
 			row.Size = UDim2.new(1, 0, 0, 38)
-			row.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+			row.BackgroundColor3 = THEME.cardBg
 			row.BorderSizePixel = 0
 			row.Parent = page
 
 			local corner = Instance.new("UICorner")
-			corner.CornerRadius = UDim.new(0, 6)
+			corner.CornerRadius = UDim.new(0, 9)
 			corner.Parent = row
 
 			local stroke = Instance.new("UIStroke")
-			stroke.Color = Color3.fromRGB(26, 26, 31)
-			stroke.Thickness = 1
+			stroke.Color = THEME.cardBorder
+			stroke.Thickness = 1.2
 			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			stroke.Parent = row
 
@@ -884,7 +908,7 @@ function SparkUI:CreateWindow(config)
 			titleLbl.Size = UDim2.new(1, -90, 1, 0)
 			titleLbl.BackgroundTransparency = 1
 			titleLbl.Text = title
-			titleLbl.TextColor3 = Color3.fromRGB(195, 195, 205)
+			titleLbl.TextColor3 = THEME.textSecondary
 			titleLbl.FontFace = FONT_MED
 			titleLbl.TextSize = 13
 			titleLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -909,18 +933,18 @@ function SparkUI:CreateWindow(config)
 			card.Name = title
 			card.LayoutOrder = itemOrder
 			card.Size = UDim2.new(1, 0, 0, 38)
-			card.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+			card.BackgroundColor3 = THEME.cardBg
 			card.BorderSizePixel = 0
 			card.ClipsDescendants = true
 			card.Parent = page
 
 			local corner = Instance.new("UICorner")
-			corner.CornerRadius = UDim.new(0, 6)
+			corner.CornerRadius = UDim.new(0, 9)
 			corner.Parent = card
 
 			local stroke = Instance.new("UIStroke")
-			stroke.Color = Color3.fromRGB(26, 26, 31)
-			stroke.Thickness = 1
+			stroke.Color = THEME.cardBorder
+			stroke.Thickness = 1.2
 			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			stroke.Parent = card
 
@@ -937,7 +961,7 @@ function SparkUI:CreateWindow(config)
 			titleLbl.Size = UDim2.new(1, -140, 1, 0)
 			titleLbl.BackgroundTransparency = 1
 			titleLbl.Text = title
-			titleLbl.TextColor3 = Color3.fromRGB(195, 195, 205)
+			titleLbl.TextColor3 = THEME.textSecondary
 			titleLbl.FontFace = FONT_MED
 			titleLbl.TextSize = 13
 			titleLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -947,17 +971,17 @@ function SparkUI:CreateWindow(config)
 			selectorPill.AnchorPoint = Vector2.new(1, 0.5)
 			selectorPill.Position = UDim2.new(1, -10, 0.5, 0)
 			selectorPill.Size = UDim2.fromOffset(108, 24)
-			selectorPill.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+			selectorPill.BackgroundColor3 = THEME.pillBg
 			selectorPill.BorderSizePixel = 0
 			selectorPill.Parent = topBtn
 
 			local pillCorner = Instance.new("UICorner")
-			pillCorner.CornerRadius = UDim.new(0, 5)
+			pillCorner.CornerRadius = UDim.new(0, 6)
 			pillCorner.Parent = selectorPill
 
 			local pillStroke = Instance.new("UIStroke")
-			pillStroke.Color = Color3.fromRGB(34, 34, 41)
-			pillStroke.Thickness = 1
+			pillStroke.Color = THEME.pillBorder
+			pillStroke.Thickness = 1.2
 			pillStroke.Parent = selectorPill
 
 			local valueLbl = Instance.new("TextLabel")
@@ -965,7 +989,7 @@ function SparkUI:CreateWindow(config)
 			valueLbl.Size = UDim2.new(1, -26, 1, 0)
 			valueLbl.BackgroundTransparency = 1
 			valueLbl.Text = selected
-			valueLbl.TextColor3 = Color3.fromRGB(225, 225, 232)
+			valueLbl.TextColor3 = THEME.textPrimary
 			valueLbl.FontFace = FONT_REG
 			valueLbl.TextSize = 12
 			valueLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -978,14 +1002,14 @@ function SparkUI:CreateWindow(config)
 			chev.Size = UDim2.fromOffset(12, 12)
 			chev.BackgroundTransparency = 1
 			chev.Image = LUCIDE.chevronDown
-			chev.ImageColor3 = Color3.fromRGB(125, 125, 136)
+			chev.ImageColor3 = THEME.textMuted
 			chev.ScaleType = Enum.ScaleType.Fit
 			chev.Parent = selectorPill
 
 			local optDivider = Instance.new("Frame")
 			optDivider.Position = UDim2.fromOffset(12, 38)
 			optDivider.Size = UDim2.new(1, -24, 0, 1)
-			optDivider.BackgroundColor3 = Color3.fromRGB(24, 24, 29)
+			optDivider.BackgroundColor3 = THEME.divider
 			optDivider.BorderSizePixel = 0
 			optDivider.Parent = card
 
@@ -1007,10 +1031,10 @@ function SparkUI:CreateWindow(config)
 					local isChosen = (opt.name == selected)
 					TweenService:Create(opt.btn, TWEEN_FAST, {
 						BackgroundTransparency = if isChosen then 0 else 1,
-						BackgroundColor3 = Color3.fromRGB(22, 22, 27),
+						BackgroundColor3 = THEME.pillBg,
 					}):Play()
 					TweenService:Create(opt.lbl, TWEEN_FAST, {
-						TextColor3 = if isChosen then Color3.fromRGB(244, 244, 250) else Color3.fromRGB(140, 140, 152),
+						TextColor3 = if isChosen then THEME.textPrimary else THEME.textMuted,
 					}):Play()
 					TweenService:Create(opt.check, TWEEN_FAST, {
 						ImageTransparency = if isChosen then 0 else 1,
@@ -1023,14 +1047,14 @@ function SparkUI:CreateWindow(config)
 				optBtn.Name = optName
 				optBtn.LayoutOrder = i
 				optBtn.Size = UDim2.new(1, 0, 0, 26)
-				optBtn.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
+				optBtn.BackgroundColor3 = THEME.pillBg
 				optBtn.BackgroundTransparency = 1
 				optBtn.AutoButtonColor = false
 				optBtn.Text = ""
 				optBtn.Parent = optHolder
 
 				local oCorner = Instance.new("UICorner")
-				oCorner.CornerRadius = UDim.new(0, 5)
+				oCorner.CornerRadius = UDim.new(0, 6)
 				oCorner.Parent = optBtn
 
 				local oLbl = Instance.new("TextLabel")
@@ -1038,7 +1062,7 @@ function SparkUI:CreateWindow(config)
 				oLbl.Size = UDim2.new(1, -30, 1, 0)
 				oLbl.BackgroundTransparency = 1
 				oLbl.Text = optName
-				oLbl.TextColor3 = Color3.fromRGB(140, 140, 152)
+				oLbl.TextColor3 = THEME.textMuted
 				oLbl.FontFace = FONT_REG
 				oLbl.TextSize = 12
 				oLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -1050,22 +1074,22 @@ function SparkUI:CreateWindow(config)
 				chk.Size = UDim2.fromOffset(12, 12)
 				chk.BackgroundTransparency = 1
 				chk.Image = LUCIDE.check
-				chk.ImageColor3 = Color3.fromRGB(240, 240, 246)
+				chk.ImageColor3 = THEME.textPrimary
 				chk.ImageTransparency = 1
 				chk.ScaleType = Enum.ScaleType.Fit
 				chk.Parent = optBtn
 
 				optBtn.MouseEnter:Connect(function()
 					if selected ~= optName then
-						TweenService:Create(optBtn, TWEEN_FAST, { BackgroundTransparency = 0.45 }):Play()
-						TweenService:Create(oLbl, TWEEN_FAST, { TextColor3 = Color3.fromRGB(215, 215, 225) }):Play()
+						TweenService:Create(optBtn, TWEEN_FAST, { BackgroundTransparency = 0.4 }):Play()
+						TweenService:Create(oLbl, TWEEN_FAST, { TextColor3 = THEME.textSecondary }):Play()
 					end
 				end)
 
 				optBtn.MouseLeave:Connect(function()
 					if selected ~= optName then
 						TweenService:Create(optBtn, TWEEN_FAST, { BackgroundTransparency = 1 }):Play()
-						TweenService:Create(oLbl, TWEEN_FAST, { TextColor3 = Color3.fromRGB(140, 140, 152) }):Play()
+						TweenService:Create(oLbl, TWEEN_FAST, { TextColor3 = THEME.textMuted }):Play()
 					end
 				end)
 
@@ -1076,8 +1100,8 @@ function SparkUI:CreateWindow(config)
 
 					isExpanded = false
 					TweenService:Create(card, TWEEN_SMOOTH, { Size = UDim2.new(1, 0, 0, 38) }):Play()
-					TweenService:Create(chev, TWEEN_SMOOTH, { Rotation = 0, ImageColor3 = Color3.fromRGB(125, 125, 136) }):Play()
-					TweenService:Create(pillStroke, TWEEN_FAST, { Color = Color3.fromRGB(34, 34, 41) }):Play()
+					TweenService:Create(chev, TWEEN_SMOOTH, { Rotation = 0, ImageColor3 = THEME.textMuted }):Play()
+					TweenService:Create(pillStroke, TWEEN_FAST, { Color = THEME.pillBorder }):Play()
 
 					if callback then
 						callback(optName)
@@ -1090,13 +1114,13 @@ function SparkUI:CreateWindow(config)
 			refreshOptions()
 
 			topBtn.MouseEnter:Connect(function()
-				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(18, 18, 22) }):Play()
-				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(36, 36, 43) }):Play()
+				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = THEME.cardHover }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = THEME.cardBorderHover }):Play()
 			end)
 
 			topBtn.MouseLeave:Connect(function()
-				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(15, 15, 18) }):Play()
-				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(26, 26, 31) }):Play()
+				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = THEME.cardBg }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = THEME.cardBorder }):Play()
 			end)
 
 			topBtn.MouseButton1Click:Connect(function()
@@ -1107,10 +1131,10 @@ function SparkUI:CreateWindow(config)
 				}):Play()
 				TweenService:Create(chev, TWEEN_SMOOTH, {
 					Rotation = if isExpanded then 180 else 0,
-					ImageColor3 = if isExpanded then Color3.fromRGB(240, 240, 248) else Color3.fromRGB(125, 125, 136),
+					ImageColor3 = if isExpanded then THEME.textPrimary else THEME.textMuted,
 				}):Play()
 				TweenService:Create(pillStroke, TWEEN_FAST, {
-					Color = if isExpanded then Color3.fromRGB(52, 52, 62) else Color3.fromRGB(34, 34, 41),
+					Color = if isExpanded then THEME.pillBorderHover else THEME.pillBorder,
 				}):Play()
 			end)
 		end
@@ -1130,17 +1154,17 @@ function SparkUI:CreateWindow(config)
 			row.Name = title
 			row.LayoutOrder = itemOrder
 			row.Size = UDim2.new(1, 0, 0, 38)
-			row.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+			row.BackgroundColor3 = THEME.cardBg
 			row.BorderSizePixel = 0
 			row.Parent = page
 
 			local corner = Instance.new("UICorner")
-			corner.CornerRadius = UDim.new(0, 6)
+			corner.CornerRadius = UDim.new(0, 9)
 			corner.Parent = row
 
 			local stroke = Instance.new("UIStroke")
-			stroke.Color = Color3.fromRGB(26, 26, 31)
-			stroke.Thickness = 1
+			stroke.Color = THEME.cardBorder
+			stroke.Thickness = 1.2
 			stroke.Parent = row
 
 			local titleLbl = Instance.new("TextLabel")
@@ -1148,7 +1172,7 @@ function SparkUI:CreateWindow(config)
 			titleLbl.Size = UDim2.new(0.45, 0, 1, 0)
 			titleLbl.BackgroundTransparency = 1
 			titleLbl.Text = title
-			titleLbl.TextColor3 = Color3.fromRGB(195, 195, 205)
+			titleLbl.TextColor3 = THEME.textSecondary
 			titleLbl.FontFace = FONT_MED
 			titleLbl.TextSize = 13
 			titleLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -1160,7 +1184,7 @@ function SparkUI:CreateWindow(config)
 			valLbl.Size = UDim2.fromOffset(52, 18)
 			valLbl.BackgroundTransparency = 1
 			valLbl.Text = tostring(defaultVal) .. suffix
-			valLbl.TextColor3 = Color3.fromRGB(145, 145, 156)
+			valLbl.TextColor3 = THEME.textMuted
 			valLbl.FontFace = FONT_REG
 			valLbl.TextSize = 12
 			valLbl.TextXAlignment = Enum.TextXAlignment.Right
@@ -1170,7 +1194,7 @@ function SparkUI:CreateWindow(config)
 			track.AnchorPoint = Vector2.new(1, 0.5)
 			track.Position = UDim2.new(1, -74, 0.5, 0)
 			track.Size = UDim2.fromOffset(135, 4)
-			track.BackgroundColor3 = Color3.fromRGB(26, 26, 32)
+			track.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
 			track.AutoButtonColor = false
 			track.Text = ""
 			track.Parent = row
@@ -1181,7 +1205,7 @@ function SparkUI:CreateWindow(config)
 
 			local fill = Instance.new("Frame")
 			fill.Size = UDim2.fromScale((defaultVal - minVal) / math.max(1, maxVal - minVal), 1)
-			fill.BackgroundColor3 = Color3.fromRGB(238, 238, 245)
+			fill.BackgroundColor3 = THEME.textPrimary
 			fill.BorderSizePixel = 0
 			fill.Parent = track
 
@@ -1203,7 +1227,7 @@ function SparkUI:CreateWindow(config)
 
 			local sliding = false
 			local function updateSlider()
-				local mouseX = UserInputService:GetMouseLocation().X
+				local mouseX = getViewportMouse().X
 				local alpha = math.clamp((mouseX - track.AbsolutePosition.X) / math.max(1, track.AbsoluteSize.X), 0, 1)
 				local value = math.round(minVal + alpha * (maxVal - minVal))
 				valLbl.Text = tostring(value) .. suffix
@@ -1218,17 +1242,17 @@ function SparkUI:CreateWindow(config)
 				updateSlider()
 			end)
 
-			UserInputService.InputEnded:Connect(function(io)
+			trackConn(UserInputService.InputEnded:Connect(function(io)
 				if io.UserInputType == Enum.UserInputType.MouseButton1 then
 					sliding = false
 				end
-			end)
+			end))
 
-			UserInputService.InputChanged:Connect(function(io)
+			trackConn(UserInputService.InputChanged:Connect(function(io)
 				if sliding and io.UserInputType == Enum.UserInputType.MouseMovement then
 					updateSlider()
 				end
-			end)
+			end))
 		end
 
 		function TabObj:AddButton(opts)
@@ -1242,18 +1266,18 @@ function SparkUI:CreateWindow(config)
 			row.Name = title
 			row.LayoutOrder = itemOrder
 			row.Size = UDim2.new(1, 0, 0, 38)
-			row.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+			row.BackgroundColor3 = THEME.cardBg
 			row.AutoButtonColor = false
 			row.Text = ""
 			row.Parent = page
 
 			local corner = Instance.new("UICorner")
-			corner.CornerRadius = UDim.new(0, 6)
+			corner.CornerRadius = UDim.new(0, 9)
 			corner.Parent = row
 
 			local stroke = Instance.new("UIStroke")
-			stroke.Color = Color3.fromRGB(26, 26, 31)
-			stroke.Thickness = 1
+			stroke.Color = THEME.cardBorder
+			stroke.Thickness = 1.2
 			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			stroke.Parent = row
 
@@ -1262,7 +1286,7 @@ function SparkUI:CreateWindow(config)
 			titleLbl.Size = UDim2.new(1, -44, 1, 0)
 			titleLbl.BackgroundTransparency = 1
 			titleLbl.Text = title
-			titleLbl.TextColor3 = Color3.fromRGB(215, 215, 224)
+			titleLbl.TextColor3 = THEME.textSecondary
 			titleLbl.FontFace = FONT_MED
 			titleLbl.TextSize = 13
 			titleLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -1274,31 +1298,31 @@ function SparkUI:CreateWindow(config)
 			arrow.Size = UDim2.fromOffset(14, 14)
 			arrow.BackgroundTransparency = 1
 			arrow.Image = LUCIDE.chevronRight
-			arrow.ImageColor3 = Color3.fromRGB(110, 110, 122)
+			arrow.ImageColor3 = THEME.textMuted
 			arrow.ScaleType = Enum.ScaleType.Fit
 			arrow.Parent = row
 
 			row.MouseEnter:Connect(function()
-				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(19, 19, 23) }):Play()
-				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(38, 38, 46) }):Play()
+				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = THEME.cardHover }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = THEME.cardBorderHover }):Play()
 				TweenService:Create(arrow, TWEEN_FAST, {
 					Position = UDim2.new(1, -11, 0.5, 0),
-					ImageColor3 = Color3.fromRGB(235, 235, 242),
+					ImageColor3 = THEME.textPrimary,
 				}):Play()
 			end)
 
 			row.MouseLeave:Connect(function()
-				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(15, 15, 18) }):Play()
-				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(26, 26, 31) }):Play()
+				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = THEME.cardBg }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = THEME.cardBorder }):Play()
 				TweenService:Create(arrow, TWEEN_FAST, {
 					Position = UDim2.new(1, -14, 0.5, 0),
-					ImageColor3 = Color3.fromRGB(110, 110, 122),
+					ImageColor3 = THEME.textMuted,
 				}):Play()
 			end)
 
 			row.MouseButton1Click:Connect(function()
-				row.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
-				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(19, 19, 23) }):Play()
+				row.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+				TweenService:Create(row, TWEEN_FAST, { BackgroundColor3 = THEME.cardHover }):Play()
 				if callback then
 					callback()
 				end
@@ -1317,31 +1341,22 @@ function SparkUI:CreateWindow(config)
 			local currentColor = defaultColor
 			local isExpanded = false
 
-			local function toHex(c)
-				return string.format(
-					"#%02X%02X%02X",
-					math.round(c.R * 255),
-					math.round(c.G * 255),
-					math.round(c.B * 255)
-				)
-			end
-
 			local card = Instance.new("Frame")
 			card.Name = title
 			card.LayoutOrder = itemOrder
 			card.Size = UDim2.new(1, 0, 0, 38)
-			card.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+			card.BackgroundColor3 = THEME.cardBg
 			card.BorderSizePixel = 0
 			card.ClipsDescendants = true
 			card.Parent = page
 
 			local corner = Instance.new("UICorner")
-			corner.CornerRadius = UDim.new(0, 6)
+			corner.CornerRadius = UDim.new(0, 9)
 			corner.Parent = card
 
 			local stroke = Instance.new("UIStroke")
-			stroke.Color = Color3.fromRGB(26, 26, 31)
-			stroke.Thickness = 1
+			stroke.Color = THEME.cardBorder
+			stroke.Thickness = 1.2
 			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			stroke.Parent = card
 
@@ -1355,90 +1370,49 @@ function SparkUI:CreateWindow(config)
 
 			local titleLbl = Instance.new("TextLabel")
 			titleLbl.Position = UDim2.fromOffset(14, 0)
-			titleLbl.Size = UDim2.new(1, -130, 1, 0)
+			titleLbl.Size = UDim2.new(1, -70, 1, 0)
 			titleLbl.BackgroundTransparency = 1
 			titleLbl.Text = title
-			titleLbl.TextColor3 = Color3.fromRGB(195, 195, 205)
+			titleLbl.TextColor3 = THEME.textSecondary
 			titleLbl.FontFace = FONT_MED
 			titleLbl.TextSize = 13
 			titleLbl.TextXAlignment = Enum.TextXAlignment.Left
 			titleLbl.Parent = topBtn
 
-			local previewPill = Instance.new("Frame")
-			previewPill.AnchorPoint = Vector2.new(1, 0.5)
-			previewPill.Position = UDim2.new(1, -12, 0.5, 0)
-			previewPill.AutomaticSize = Enum.AutomaticSize.X
-			previewPill.Size = UDim2.fromOffset(0, 22)
-			previewPill.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-			previewPill.BorderSizePixel = 0
-			previewPill.Parent = topBtn
-
-			local pPad = Instance.new("UIPadding")
-			pPad.PaddingLeft = UDim.new(0, 8)
-			pPad.PaddingRight = UDim.new(0, 6)
-			pPad.Parent = previewPill
-
-			local pCorner = Instance.new("UICorner")
-			pCorner.CornerRadius = UDim.new(0, 5)
-			pCorner.Parent = previewPill
-
-			local pStroke = Instance.new("UIStroke")
-			pStroke.Color = Color3.fromRGB(34, 34, 41)
-			pStroke.Thickness = 1
-			pStroke.Parent = previewPill
-
-			local pLayout = Instance.new("UIListLayout")
-			pLayout.FillDirection = Enum.FillDirection.Horizontal
-			pLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-			pLayout.Padding = UDim.new(0, 7)
-			pLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			pLayout.Parent = previewPill
-
-			local hexPreviewLbl = Instance.new("TextLabel")
-			hexPreviewLbl.LayoutOrder = 1
-			hexPreviewLbl.AutomaticSize = Enum.AutomaticSize.X
-			hexPreviewLbl.Size = UDim2.new(0, 0, 1, 0)
-			hexPreviewLbl.BackgroundTransparency = 1
-			hexPreviewLbl.Text = toHex(currentColor)
-			hexPreviewLbl.TextColor3 = Color3.fromRGB(155, 155, 168)
-			hexPreviewLbl.FontFace = FONT_REG
-			hexPreviewLbl.TextSize = 11
-			hexPreviewLbl.Parent = previewPill
-
 			local swatch = Instance.new("Frame")
-			swatch.LayoutOrder = 2
-			swatch.Size = UDim2.fromOffset(12, 12)
+			swatch.AnchorPoint = Vector2.new(1, 0.5)
+			swatch.Position = UDim2.new(1, -14, 0.5, 0)
+			swatch.Size = UDim2.fromOffset(28, 16)
 			swatch.BackgroundColor3 = currentColor
 			swatch.BorderSizePixel = 0
-			swatch.Parent = previewPill
+			swatch.Parent = topBtn
 
 			local swCorner = Instance.new("UICorner")
-			swCorner.CornerRadius = UDim.new(0, 3)
+			swCorner.CornerRadius = UDim.new(0, 5)
 			swCorner.Parent = swatch
 
 			local swStroke = Instance.new("UIStroke")
-			swStroke.Color = Color3.fromRGB(255, 255, 255)
-			swStroke.Transparency = 0.8
-			swStroke.Thickness = 1
+			swStroke.Color = THEME.pillBorder
+			swStroke.Thickness = 1.2
 			swStroke.Parent = swatch
 
 			local optDivider = Instance.new("Frame")
 			optDivider.Position = UDim2.fromOffset(12, 38)
 			optDivider.Size = UDim2.new(1, -24, 0, 1)
-			optDivider.BackgroundColor3 = Color3.fromRGB(24, 24, 29)
+			optDivider.BackgroundColor3 = THEME.divider
 			optDivider.BorderSizePixel = 0
 			optDivider.Parent = card
 
 			local body = Instance.new("Frame")
 			body.Position = UDim2.fromOffset(12, 46)
-			body.Size = UDim2.new(1, -24, 0, 118)
+			body.Size = UDim2.new(1, -24, 0, 112)
 			body.BackgroundTransparency = 1
 			body.Parent = card
 
 			local svBox = Instance.new("TextButton")
 			svBox.Name = "SVBox"
 			svBox.Position = UDim2.fromOffset(0, 0)
-			svBox.Size = UDim2.new(1, -138, 0, 112)
+			svBox.Size = UDim2.new(1, -24, 0, 112)
 			svBox.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
 			svBox.BorderSizePixel = 0
 			svBox.AutoButtonColor = false
@@ -1447,12 +1421,12 @@ function SparkUI:CreateWindow(config)
 			svBox.Parent = body
 
 			local svCorner = Instance.new("UICorner")
-			svCorner.CornerRadius = UDim.new(0, 5)
+			svCorner.CornerRadius = UDim.new(0, 6)
 			svCorner.Parent = svBox
 
 			local svStroke = Instance.new("UIStroke")
-			svStroke.Color = Color3.fromRGB(34, 34, 42)
-			svStroke.Thickness = 1
+			svStroke.Color = THEME.pillBorder
+			svStroke.Thickness = 1.2
 			svStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			svStroke.Parent = svBox
 
@@ -1463,7 +1437,7 @@ function SparkUI:CreateWindow(config)
 			satOverlay.Parent = svBox
 
 			local satCorner = Instance.new("UICorner")
-			satCorner.CornerRadius = UDim.new(0, 5)
+			satCorner.CornerRadius = UDim.new(0, 6)
 			satCorner.Parent = satOverlay
 
 			local satGrad = Instance.new("UIGradient")
@@ -1481,7 +1455,7 @@ function SparkUI:CreateWindow(config)
 			valOverlay.Parent = svBox
 
 			local valCorner = Instance.new("UICorner")
-			valCorner.CornerRadius = UDim.new(0, 5)
+			valCorner.CornerRadius = UDim.new(0, 6)
 			valCorner.Parent = valOverlay
 
 			local valGrad = Instance.new("UIGradient")
@@ -1496,7 +1470,7 @@ function SparkUI:CreateWindow(config)
 			svCursor.AnchorPoint = Vector2.new(0.5, 0.5)
 			svCursor.Position = UDim2.fromScale(s, 1 - v)
 			svCursor.Size = UDim2.fromOffset(10, 10)
-			svCursor.BackgroundColor3 = currentColor
+			svCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			svCursor.BorderSizePixel = 0
 			svCursor.ZIndex = 3
 			svCursor.Parent = svBox
@@ -1506,13 +1480,13 @@ function SparkUI:CreateWindow(config)
 			svCurCorner.Parent = svCursor
 
 			local svCurStroke = Instance.new("UIStroke")
-			svCurStroke.Color = Color3.fromRGB(255, 255, 255)
-			svCurStroke.Thickness = 1.5
+			svCurStroke.Color = Color3.fromRGB(10, 10, 10)
+			svCurStroke.Thickness = 1.2
 			svCurStroke.Parent = svCursor
 
 			local hueBar = Instance.new("TextButton")
 			hueBar.Name = "HueBar"
-			hueBar.Position = UDim2.new(1, -128, 0, 0)
+			hueBar.Position = UDim2.new(1, -14, 0, 0)
 			hueBar.Size = UDim2.fromOffset(14, 112)
 			hueBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			hueBar.BorderSizePixel = 0
@@ -1525,8 +1499,8 @@ function SparkUI:CreateWindow(config)
 			hueCorner.Parent = hueBar
 
 			local hueStroke = Instance.new("UIStroke")
-			hueStroke.Color = Color3.fromRGB(34, 34, 42)
-			hueStroke.Thickness = 1
+			hueStroke.Color = THEME.pillBorder
+			hueStroke.Thickness = 1.2
 			hueStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			hueStroke.Parent = hueBar
 
@@ -1556,145 +1530,33 @@ function SparkUI:CreateWindow(config)
 			hThumbCorner.Parent = hueThumb
 
 			local hThumbStroke = Instance.new("UIStroke")
-			hThumbStroke.Color = Color3.fromRGB(15, 15, 18)
+			hThumbStroke.Color = Color3.fromRGB(10, 10, 10)
 			hThumbStroke.Thickness = 1
 			hThumbStroke.Parent = hueThumb
 
-			local infoPanel = Instance.new("Frame")
-			infoPanel.Position = UDim2.new(1, -104, 0, 0)
-			infoPanel.Size = UDim2.fromOffset(104, 112)
-			infoPanel.BackgroundTransparency = 1
-			infoPanel.Parent = body
-
-			local hexCard = Instance.new("Frame")
-			hexCard.Size = UDim2.new(1, 0, 0, 26)
-			hexCard.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-			hexCard.BorderSizePixel = 0
-			hexCard.Parent = infoPanel
-
-			local hexCardCorner = Instance.new("UICorner")
-			hexCardCorner.CornerRadius = UDim.new(0, 5)
-			hexCardCorner.Parent = hexCard
-
-			local hexCardStroke = Instance.new("UIStroke")
-			hexCardStroke.Color = Color3.fromRGB(32, 32, 39)
-			hexCardStroke.Thickness = 1
-			hexCardStroke.Parent = hexCard
-
-			local hexTag = Instance.new("TextLabel")
-			hexTag.Position = UDim2.fromOffset(8, 0)
-			hexTag.Size = UDim2.fromOffset(26, 26)
-			hexTag.BackgroundTransparency = 1
-			hexTag.Text = "HEX"
-			hexTag.TextColor3 = Color3.fromRGB(108, 108, 120)
-			hexTag.FontFace = FONT_SEMI
-			hexTag.TextSize = 10
-			hexTag.TextXAlignment = Enum.TextXAlignment.Left
-			hexTag.Parent = hexCard
-
-			local hexInput = Instance.new("TextBox")
-			hexInput.Position = UDim2.fromOffset(36, 0)
-			hexInput.Size = UDim2.new(1, -42, 1, 0)
-			hexInput.BackgroundTransparency = 1
-			hexInput.Text = toHex(currentColor)
-			hexInput.TextColor3 = Color3.fromRGB(235, 235, 242)
-			hexInput.FontFace = FONT_MED
-			hexInput.TextSize = 11
-			hexInput.TextXAlignment = Enum.TextXAlignment.Right
-			hexInput.ClearTextOnFocus = false
-			hexInput.Parent = hexCard
-
-			local function makeChannelRow(label, yOffset, initVal)
-				local cRow = Instance.new("Frame")
-				cRow.Position = UDim2.fromOffset(0, yOffset)
-				cRow.Size = UDim2.new(1, 0, 0, 24)
-				cRow.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-				cRow.BorderSizePixel = 0
-				cRow.Parent = infoPanel
-
-				local cCorner = Instance.new("UICorner")
-				cCorner.CornerRadius = UDim.new(0, 5)
-				cCorner.Parent = cRow
-
-				local cStroke = Instance.new("UIStroke")
-				cStroke.Color = Color3.fromRGB(32, 32, 39)
-				cStroke.Thickness = 1
-				cStroke.Parent = cRow
-
-				local cTag = Instance.new("TextLabel")
-				cTag.Position = UDim2.fromOffset(8, 0)
-				cTag.Size = UDim2.fromOffset(20, 24)
-				cTag.BackgroundTransparency = 1
-				cTag.Text = label
-				cTag.TextColor3 = Color3.fromRGB(108, 108, 120)
-				cTag.FontFace = FONT_SEMI
-				cTag.TextSize = 10
-				cTag.TextXAlignment = Enum.TextXAlignment.Left
-				cTag.Parent = cRow
-
-				local cVal = Instance.new("TextLabel")
-				cVal.Position = UDim2.fromOffset(28, 0)
-				cVal.Size = UDim2.new(1, -36, 1, 0)
-				cVal.BackgroundTransparency = 1
-				cVal.Text = tostring(initVal)
-				cVal.TextColor3 = Color3.fromRGB(215, 215, 224)
-				cVal.FontFace = FONT_REG
-				cVal.TextSize = 11
-				cVal.TextXAlignment = Enum.TextXAlignment.Right
-				cVal.Parent = cRow
-
-				return cVal
-			end
-
-			local rLbl = makeChannelRow("R", 32, math.round(currentColor.R * 255))
-			local gLbl = makeChannelRow("G", 60, math.round(currentColor.G * 255))
-			local bLbl = makeChannelRow("B", 88, math.round(currentColor.B * 255))
-
 			local function applyColor()
 				currentColor = Color3.fromHSV(h, s, v)
-				local hexStr = toHex(currentColor)
 				swatch.BackgroundColor3 = currentColor
-				hexPreviewLbl.Text = hexStr
-				hexInput.Text = hexStr
 				svBox.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
 				svCursor.Position = UDim2.fromScale(s, 1 - v)
-				svCursor.BackgroundColor3 = currentColor
 				hueThumb.Position = UDim2.fromScale(0.5, h)
-				rLbl.Text = tostring(math.round(currentColor.R * 255))
-				gLbl.Text = tostring(math.round(currentColor.G * 255))
-				bLbl.Text = tostring(math.round(currentColor.B * 255))
 				if callback then
 					callback(currentColor)
 				end
 			end
 
-			hexInput.FocusLost:Connect(function()
-				local raw = string.gsub(hexInput.Text, "^#", "")
-				if #raw == 6 then
-					local r = tonumber(string.sub(raw, 1, 2), 16)
-					local g = tonumber(string.sub(raw, 3, 4), 16)
-					local b = tonumber(string.sub(raw, 5, 6), 16)
-					if r and g and b then
-						h, s, v = Color3.fromRGB(r, g, b):ToHSV()
-						applyColor()
-						return
-					end
-				end
-				hexInput.Text = toHex(currentColor)
-			end)
-
 			local draggingSV = false
 			local draggingHue = false
 
 			local function updateSV()
-				local mouse = UserInputService:GetMouseLocation()
+				local mouse = getViewportMouse()
 				s = math.clamp((mouse.X - svBox.AbsolutePosition.X) / math.max(1, svBox.AbsoluteSize.X), 0, 1)
 				v = 1 - math.clamp((mouse.Y - svBox.AbsolutePosition.Y) / math.max(1, svBox.AbsoluteSize.Y), 0, 1)
 				applyColor()
 			end
 
 			local function updateHue()
-				local mouse = UserInputService:GetMouseLocation()
+				local mouse = getViewportMouse()
 				h = math.clamp((mouse.Y - hueBar.AbsolutePosition.Y) / math.max(1, hueBar.AbsoluteSize.Y), 0, 1)
 				applyColor()
 			end
@@ -1727,13 +1589,13 @@ function SparkUI:CreateWindow(config)
 			end))
 
 			topBtn.MouseEnter:Connect(function()
-				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(18, 18, 22) }):Play()
-				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(36, 36, 43) }):Play()
+				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = THEME.cardHover }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = THEME.cardBorderHover }):Play()
 			end)
 
 			topBtn.MouseLeave:Connect(function()
-				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(15, 15, 18) }):Play()
-				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(26, 26, 31) }):Play()
+				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = THEME.cardBg }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = THEME.cardBorder }):Play()
 			end)
 
 			topBtn.MouseButton1Click:Connect(function()
@@ -1741,8 +1603,8 @@ function SparkUI:CreateWindow(config)
 				TweenService:Create(card, TWEEN_SMOOTH, {
 					Size = UDim2.new(1, 0, 0, if isExpanded then 168 else 38),
 				}):Play()
-				TweenService:Create(pStroke, TWEEN_FAST, {
-					Color = if isExpanded then Color3.fromRGB(52, 52, 62) else Color3.fromRGB(34, 34, 41),
+				TweenService:Create(swStroke, TWEEN_FAST, {
+					Color = if isExpanded then THEME.pillBorderHover else THEME.pillBorder,
 				}):Play()
 			end)
 		end
