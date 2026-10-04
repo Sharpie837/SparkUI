@@ -1305,6 +1305,448 @@ function SparkUI:CreateWindow(config)
 			end)
 		end
 
+		function TabObj:AddColorPicker(opts)
+			opts = opts or {}
+			local title = opts.Title or "Color Picker"
+			local defaultColor = opts.Default or Color3.fromRGB(255, 255, 255)
+			local callback = opts.Callback
+
+			itemOrder += 1
+
+			local h, s, v = defaultColor:ToHSV()
+			local currentColor = defaultColor
+			local isExpanded = false
+
+			local function toHex(c)
+				return string.format(
+					"#%02X%02X%02X",
+					math.round(c.R * 255),
+					math.round(c.G * 255),
+					math.round(c.B * 255)
+				)
+			end
+
+			local card = Instance.new("Frame")
+			card.Name = title
+			card.LayoutOrder = itemOrder
+			card.Size = UDim2.new(1, 0, 0, 38)
+			card.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+			card.BorderSizePixel = 0
+			card.ClipsDescendants = true
+			card.Parent = page
+
+			local corner = Instance.new("UICorner")
+			corner.CornerRadius = UDim.new(0, 6)
+			corner.Parent = card
+
+			local stroke = Instance.new("UIStroke")
+			stroke.Color = Color3.fromRGB(26, 26, 31)
+			stroke.Thickness = 1
+			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			stroke.Parent = card
+
+			local topBtn = Instance.new("TextButton")
+			topBtn.Name = "Header"
+			topBtn.Size = UDim2.new(1, 0, 0, 38)
+			topBtn.BackgroundTransparency = 1
+			topBtn.AutoButtonColor = false
+			topBtn.Text = ""
+			topBtn.Parent = card
+
+			local titleLbl = Instance.new("TextLabel")
+			titleLbl.Position = UDim2.fromOffset(14, 0)
+			titleLbl.Size = UDim2.new(1, -130, 1, 0)
+			titleLbl.BackgroundTransparency = 1
+			titleLbl.Text = title
+			titleLbl.TextColor3 = Color3.fromRGB(195, 195, 205)
+			titleLbl.FontFace = FONT_MED
+			titleLbl.TextSize = 13
+			titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+			titleLbl.Parent = topBtn
+
+			local previewPill = Instance.new("Frame")
+			previewPill.AnchorPoint = Vector2.new(1, 0.5)
+			previewPill.Position = UDim2.new(1, -12, 0.5, 0)
+			previewPill.AutomaticSize = Enum.AutomaticSize.X
+			previewPill.Size = UDim2.fromOffset(0, 22)
+			previewPill.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+			previewPill.BorderSizePixel = 0
+			previewPill.Parent = topBtn
+
+			local pPad = Instance.new("UIPadding")
+			pPad.PaddingLeft = UDim.new(0, 8)
+			pPad.PaddingRight = UDim.new(0, 6)
+			pPad.Parent = previewPill
+
+			local pCorner = Instance.new("UICorner")
+			pCorner.CornerRadius = UDim.new(0, 5)
+			pCorner.Parent = previewPill
+
+			local pStroke = Instance.new("UIStroke")
+			pStroke.Color = Color3.fromRGB(34, 34, 41)
+			pStroke.Thickness = 1
+			pStroke.Parent = previewPill
+
+			local pLayout = Instance.new("UIListLayout")
+			pLayout.FillDirection = Enum.FillDirection.Horizontal
+			pLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			pLayout.Padding = UDim.new(0, 7)
+			pLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			pLayout.Parent = previewPill
+
+			local hexPreviewLbl = Instance.new("TextLabel")
+			hexPreviewLbl.LayoutOrder = 1
+			hexPreviewLbl.AutomaticSize = Enum.AutomaticSize.X
+			hexPreviewLbl.Size = UDim2.new(0, 0, 1, 0)
+			hexPreviewLbl.BackgroundTransparency = 1
+			hexPreviewLbl.Text = toHex(currentColor)
+			hexPreviewLbl.TextColor3 = Color3.fromRGB(155, 155, 168)
+			hexPreviewLbl.FontFace = FONT_REG
+			hexPreviewLbl.TextSize = 11
+			hexPreviewLbl.Parent = previewPill
+
+			local swatch = Instance.new("Frame")
+			swatch.LayoutOrder = 2
+			swatch.Size = UDim2.fromOffset(12, 12)
+			swatch.BackgroundColor3 = currentColor
+			swatch.BorderSizePixel = 0
+			swatch.Parent = previewPill
+
+			local swCorner = Instance.new("UICorner")
+			swCorner.CornerRadius = UDim.new(0, 3)
+			swCorner.Parent = swatch
+
+			local swStroke = Instance.new("UIStroke")
+			swStroke.Color = Color3.fromRGB(255, 255, 255)
+			swStroke.Transparency = 0.8
+			swStroke.Thickness = 1
+			swStroke.Parent = swatch
+
+			local optDivider = Instance.new("Frame")
+			optDivider.Position = UDim2.fromOffset(12, 38)
+			optDivider.Size = UDim2.new(1, -24, 0, 1)
+			optDivider.BackgroundColor3 = Color3.fromRGB(24, 24, 29)
+			optDivider.BorderSizePixel = 0
+			optDivider.Parent = card
+
+			local body = Instance.new("Frame")
+			body.Position = UDim2.fromOffset(12, 46)
+			body.Size = UDim2.new(1, -24, 0, 118)
+			body.BackgroundTransparency = 1
+			body.Parent = card
+
+			local svBox = Instance.new("TextButton")
+			svBox.Name = "SVBox"
+			svBox.Position = UDim2.fromOffset(0, 0)
+			svBox.Size = UDim2.new(1, -138, 0, 112)
+			svBox.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+			svBox.BorderSizePixel = 0
+			svBox.AutoButtonColor = false
+			svBox.Text = ""
+			svBox.ClipsDescendants = true
+			svBox.Parent = body
+
+			local svCorner = Instance.new("UICorner")
+			svCorner.CornerRadius = UDim.new(0, 5)
+			svCorner.Parent = svBox
+
+			local svStroke = Instance.new("UIStroke")
+			svStroke.Color = Color3.fromRGB(34, 34, 42)
+			svStroke.Thickness = 1
+			svStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			svStroke.Parent = svBox
+
+			local satOverlay = Instance.new("Frame")
+			satOverlay.Size = UDim2.fromScale(1, 1)
+			satOverlay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			satOverlay.BorderSizePixel = 0
+			satOverlay.Parent = svBox
+
+			local satCorner = Instance.new("UICorner")
+			satCorner.CornerRadius = UDim.new(0, 5)
+			satCorner.Parent = satOverlay
+
+			local satGrad = Instance.new("UIGradient")
+			satGrad.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 0),
+				NumberSequenceKeypoint.new(1, 1),
+			})
+			satGrad.Parent = satOverlay
+
+			local valOverlay = Instance.new("Frame")
+			valOverlay.Size = UDim2.fromScale(1, 1)
+			valOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+			valOverlay.BorderSizePixel = 0
+			valOverlay.ZIndex = 2
+			valOverlay.Parent = svBox
+
+			local valCorner = Instance.new("UICorner")
+			valCorner.CornerRadius = UDim.new(0, 5)
+			valCorner.Parent = valOverlay
+
+			local valGrad = Instance.new("UIGradient")
+			valGrad.Rotation = 90
+			valGrad.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 1),
+				NumberSequenceKeypoint.new(1, 0),
+			})
+			valGrad.Parent = valOverlay
+
+			local svCursor = Instance.new("Frame")
+			svCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+			svCursor.Position = UDim2.fromScale(s, 1 - v)
+			svCursor.Size = UDim2.fromOffset(10, 10)
+			svCursor.BackgroundColor3 = currentColor
+			svCursor.BorderSizePixel = 0
+			svCursor.ZIndex = 3
+			svCursor.Parent = svBox
+
+			local svCurCorner = Instance.new("UICorner")
+			svCurCorner.CornerRadius = UDim.new(1, 0)
+			svCurCorner.Parent = svCursor
+
+			local svCurStroke = Instance.new("UIStroke")
+			svCurStroke.Color = Color3.fromRGB(255, 255, 255)
+			svCurStroke.Thickness = 1.5
+			svCurStroke.Parent = svCursor
+
+			local hueBar = Instance.new("TextButton")
+			hueBar.Name = "HueBar"
+			hueBar.Position = UDim2.new(1, -128, 0, 0)
+			hueBar.Size = UDim2.fromOffset(14, 112)
+			hueBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			hueBar.BorderSizePixel = 0
+			hueBar.AutoButtonColor = false
+			hueBar.Text = ""
+			hueBar.Parent = body
+
+			local hueCorner = Instance.new("UICorner")
+			hueCorner.CornerRadius = UDim.new(0, 5)
+			hueCorner.Parent = hueBar
+
+			local hueStroke = Instance.new("UIStroke")
+			hueStroke.Color = Color3.fromRGB(34, 34, 42)
+			hueStroke.Thickness = 1
+			hueStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			hueStroke.Parent = hueBar
+
+			local hueGrad = Instance.new("UIGradient")
+			hueGrad.Rotation = 90
+			hueGrad.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+				ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+				ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
+				ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+				ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
+			})
+			hueGrad.Parent = hueBar
+
+			local hueThumb = Instance.new("Frame")
+			hueThumb.AnchorPoint = Vector2.new(0.5, 0.5)
+			hueThumb.Position = UDim2.fromScale(0.5, h)
+			hueThumb.Size = UDim2.new(1, 4, 0, 5)
+			hueThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			hueThumb.BorderSizePixel = 0
+			hueThumb.Parent = hueBar
+
+			local hThumbCorner = Instance.new("UICorner")
+			hThumbCorner.CornerRadius = UDim.new(1, 0)
+			hThumbCorner.Parent = hueThumb
+
+			local hThumbStroke = Instance.new("UIStroke")
+			hThumbStroke.Color = Color3.fromRGB(15, 15, 18)
+			hThumbStroke.Thickness = 1
+			hThumbStroke.Parent = hueThumb
+
+			local infoPanel = Instance.new("Frame")
+			infoPanel.Position = UDim2.new(1, -104, 0, 0)
+			infoPanel.Size = UDim2.fromOffset(104, 112)
+			infoPanel.BackgroundTransparency = 1
+			infoPanel.Parent = body
+
+			local hexCard = Instance.new("Frame")
+			hexCard.Size = UDim2.new(1, 0, 0, 26)
+			hexCard.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+			hexCard.BorderSizePixel = 0
+			hexCard.Parent = infoPanel
+
+			local hexCardCorner = Instance.new("UICorner")
+			hexCardCorner.CornerRadius = UDim.new(0, 5)
+			hexCardCorner.Parent = hexCard
+
+			local hexCardStroke = Instance.new("UIStroke")
+			hexCardStroke.Color = Color3.fromRGB(32, 32, 39)
+			hexCardStroke.Thickness = 1
+			hexCardStroke.Parent = hexCard
+
+			local hexTag = Instance.new("TextLabel")
+			hexTag.Position = UDim2.fromOffset(8, 0)
+			hexTag.Size = UDim2.fromOffset(26, 26)
+			hexTag.BackgroundTransparency = 1
+			hexTag.Text = "HEX"
+			hexTag.TextColor3 = Color3.fromRGB(108, 108, 120)
+			hexTag.FontFace = FONT_SEMI
+			hexTag.TextSize = 10
+			hexTag.TextXAlignment = Enum.TextXAlignment.Left
+			hexTag.Parent = hexCard
+
+			local hexInput = Instance.new("TextBox")
+			hexInput.Position = UDim2.fromOffset(36, 0)
+			hexInput.Size = UDim2.new(1, -42, 1, 0)
+			hexInput.BackgroundTransparency = 1
+			hexInput.Text = toHex(currentColor)
+			hexInput.TextColor3 = Color3.fromRGB(235, 235, 242)
+			hexInput.FontFace = FONT_MED
+			hexInput.TextSize = 11
+			hexInput.TextXAlignment = Enum.TextXAlignment.Right
+			hexInput.ClearTextOnFocus = false
+			hexInput.Parent = hexCard
+
+			local function makeChannelRow(label, yOffset, initVal)
+				local cRow = Instance.new("Frame")
+				cRow.Position = UDim2.fromOffset(0, yOffset)
+				cRow.Size = UDim2.new(1, 0, 0, 24)
+				cRow.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+				cRow.BorderSizePixel = 0
+				cRow.Parent = infoPanel
+
+				local cCorner = Instance.new("UICorner")
+				cCorner.CornerRadius = UDim.new(0, 5)
+				cCorner.Parent = cRow
+
+				local cStroke = Instance.new("UIStroke")
+				cStroke.Color = Color3.fromRGB(32, 32, 39)
+				cStroke.Thickness = 1
+				cStroke.Parent = cRow
+
+				local cTag = Instance.new("TextLabel")
+				cTag.Position = UDim2.fromOffset(8, 0)
+				cTag.Size = UDim2.fromOffset(20, 24)
+				cTag.BackgroundTransparency = 1
+				cTag.Text = label
+				cTag.TextColor3 = Color3.fromRGB(108, 108, 120)
+				cTag.FontFace = FONT_SEMI
+				cTag.TextSize = 10
+				cTag.TextXAlignment = Enum.TextXAlignment.Left
+				cTag.Parent = cRow
+
+				local cVal = Instance.new("TextLabel")
+				cVal.Position = UDim2.fromOffset(28, 0)
+				cVal.Size = UDim2.new(1, -36, 1, 0)
+				cVal.BackgroundTransparency = 1
+				cVal.Text = tostring(initVal)
+				cVal.TextColor3 = Color3.fromRGB(215, 215, 224)
+				cVal.FontFace = FONT_REG
+				cVal.TextSize = 11
+				cVal.TextXAlignment = Enum.TextXAlignment.Right
+				cVal.Parent = cRow
+
+				return cVal
+			end
+
+			local rLbl = makeChannelRow("R", 32, math.round(currentColor.R * 255))
+			local gLbl = makeChannelRow("G", 60, math.round(currentColor.G * 255))
+			local bLbl = makeChannelRow("B", 88, math.round(currentColor.B * 255))
+
+			local function applyColor()
+				currentColor = Color3.fromHSV(h, s, v)
+				local hexStr = toHex(currentColor)
+				swatch.BackgroundColor3 = currentColor
+				hexPreviewLbl.Text = hexStr
+				hexInput.Text = hexStr
+				svBox.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+				svCursor.Position = UDim2.fromScale(s, 1 - v)
+				svCursor.BackgroundColor3 = currentColor
+				hueThumb.Position = UDim2.fromScale(0.5, h)
+				rLbl.Text = tostring(math.round(currentColor.R * 255))
+				gLbl.Text = tostring(math.round(currentColor.G * 255))
+				bLbl.Text = tostring(math.round(currentColor.B * 255))
+				if callback then
+					callback(currentColor)
+				end
+			end
+
+			hexInput.FocusLost:Connect(function()
+				local raw = string.gsub(hexInput.Text, "^#", "")
+				if #raw == 6 then
+					local r = tonumber(string.sub(raw, 1, 2), 16)
+					local g = tonumber(string.sub(raw, 3, 4), 16)
+					local b = tonumber(string.sub(raw, 5, 6), 16)
+					if r and g and b then
+						h, s, v = Color3.fromRGB(r, g, b):ToHSV()
+						applyColor()
+						return
+					end
+				end
+				hexInput.Text = toHex(currentColor)
+			end)
+
+			local draggingSV = false
+			local draggingHue = false
+
+			local function updateSV()
+				local mouse = UserInputService:GetMouseLocation()
+				s = math.clamp((mouse.X - svBox.AbsolutePosition.X) / math.max(1, svBox.AbsoluteSize.X), 0, 1)
+				v = 1 - math.clamp((mouse.Y - svBox.AbsolutePosition.Y) / math.max(1, svBox.AbsoluteSize.Y), 0, 1)
+				applyColor()
+			end
+
+			local function updateHue()
+				local mouse = UserInputService:GetMouseLocation()
+				h = math.clamp((mouse.Y - hueBar.AbsolutePosition.Y) / math.max(1, hueBar.AbsoluteSize.Y), 0, 1)
+				applyColor()
+			end
+
+			svBox.MouseButton1Down:Connect(function()
+				draggingSV = true
+				updateSV()
+			end)
+
+			hueBar.MouseButton1Down:Connect(function()
+				draggingHue = true
+				updateHue()
+			end)
+
+			trackConn(UserInputService.InputEnded:Connect(function(io)
+				if io.UserInputType == Enum.UserInputType.MouseButton1 then
+					draggingSV = false
+					draggingHue = false
+				end
+			end))
+
+			trackConn(UserInputService.InputChanged:Connect(function(io)
+				if io.UserInputType == Enum.UserInputType.MouseMovement then
+					if draggingSV then
+						updateSV()
+					elseif draggingHue then
+						updateHue()
+					end
+				end
+			end))
+
+			topBtn.MouseEnter:Connect(function()
+				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(18, 18, 22) }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(36, 36, 43) }):Play()
+			end)
+
+			topBtn.MouseLeave:Connect(function()
+				TweenService:Create(card, TWEEN_FAST, { BackgroundColor3 = Color3.fromRGB(15, 15, 18) }):Play()
+				TweenService:Create(stroke, TWEEN_FAST, { Color = Color3.fromRGB(26, 26, 31) }):Play()
+			end)
+
+			topBtn.MouseButton1Click:Connect(function()
+				isExpanded = not isExpanded
+				TweenService:Create(card, TWEEN_SMOOTH, {
+					Size = UDim2.new(1, 0, 0, if isExpanded then 168 else 38),
+				}):Play()
+				TweenService:Create(pStroke, TWEEN_FAST, {
+					Color = if isExpanded then Color3.fromRGB(52, 52, 62) else Color3.fromRGB(34, 34, 41),
+				}):Play()
+			end)
+		end
+
 		return TabObj
 	end
 

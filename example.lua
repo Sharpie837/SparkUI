@@ -33,6 +33,12 @@ MainTab:AddSlider({
 	Callback = function(value) end,
 })
 
+MainTab:AddColorPicker({
+	Title = "Example Colorpicker",
+	Default = Color3.fromRGB(255, 255, 255),
+	Callback = function(color) end,
+})
+
 MainTab:AddKeybind({
 	Title = "Example Keybind",
 	Default = Enum.KeyCode.E,
