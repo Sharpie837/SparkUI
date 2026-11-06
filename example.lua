@@ -1,4 +1,4 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sharpie837/SPARKUI/main/main.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sharpie837/SparkUI/main/main.lua"))()
 
 local Window = Library:CreateWindow({
 	Title = "Spark",
