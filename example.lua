@@ -81,6 +81,17 @@ local MyDropdown = Controls:AddDropdown({
 	end,
 })
 
+local MyMultiDropdown = Controls:AddDropdown({
+	Name = "Multi Dropdown",
+	Options = { "Head", "Torso", "Arms", "Legs" },
+	Default = { "Head", "Torso" },
+	Multi = true,
+	Flag = "Targets",
+	Callback = function(selected)
+		print("Multi Dropdown:", table.concat(selected, ", "))
+	end,
+})
+
 Controls:AddColorPicker({
 	Name = "Color",
 	Default = Color3.fromRGB(69, 255, 122),
